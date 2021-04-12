@@ -1,0 +1,33 @@
+version: "2.3"
+
+volumes:
+  my-datavolume:
+
+services:
+
+  mysql:
+    image: mysql
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_DATABASE=keycloak
+      - MYSQL_USER=keycloak
+      - MYSQL_PASSWORD=password
+      - MYSQL_ROOT_PASSWORD=root_password
+    volumes:
+      - my-datavolume:/var/lib/mysql
+
+  keycloak:
+    image: jboss/keycloak
+    volumes:
+      - "./realm_properties.json:/etc/security/realm_properties.json"
+    ports:
+      - "8080:8080"
+    environment:
+      - MYSQL_DATABASE=keycloak
+      - MYSQL_USERNAME=keycloak
+      - MYSQL_PASSWORD=password
+      - KEYCLOAK_USER=admin
+      - KEYCLOAK_PASSWORD=admin
+      - KEYCLOAK_IMPORT=/etc/security/realm_properties.json
+    command: ["-Djboss.http.port=8080", "-Dkeycloak.profile.feature.upload_scripts=enabled"]
